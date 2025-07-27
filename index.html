@@ -2,141 +2,108 @@
 <html>
 
 <head>
-    <title>Darts Pro</title>
-    <link rel="stylesheet" href="css/reset.css" type="text/css">
-    <link rel="stylesheet" href="css/main.css" type="text/css">
-    <link rel="stylesheet" href="css/ios_fullscreen.css" type="text/css">
-    <link rel='shortcut icon' type='image/x-icon' href='./favicon.ico' />
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Darts Promotion Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
 
-    <meta name="viewport"
-        content="width=device-width, user-scalable=no, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, minimal-ui" />
-    <meta name="msapplication-tap-highlight" content="no" />
+        .demo-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
 
-    <script type="text/javascript" src="js/createjs.min.js"></script>
-    <script type="text/javascript" src="js/howler.min.js"></script>
-    <script type="text/javascript" src="js/screenfull.js"></script>
-    <script type="text/javascript" src="js/hammer.min.js"></script>
-    <script type="text/javascript" src="js/platform.js"></script>
-    <script type="text/javascript" src="js/ios_fullscreen.js"></script>
-    <script type="text/javascript" src="js/ctl_utils.js"></script>
-    <script type="text/javascript" src="js/sprite_lib.js"></script>
-    <script type="text/javascript" src="js/settings.js"></script>
-    <script type="text/javascript" src="js/CMain.js"></script>
-    <script type="text/javascript" src="js/CLang.min.js"></script>
-    <script type="text/javascript" src="js/CLocalStorage.js"></script>
-    <script type="text/javascript" src="js/CPreloader.js"></script>
-    <script type="text/javascript" src="js/CToggle.js"></script>
-    <script type="text/javascript" src="js/CGfxButton.js"></script>
-    <script type="text/javascript" src="js/CMenu.js"></script>
-    <script type="text/javascript" src="js/CGame.js"></script>
-    <script type="text/javascript" src="js/CInterface.js"></script>
-    <script type="text/javascript" src="js/CEndPanelSingleMode.js"></script>
-    <script type="text/javascript" src="js/CEndPanelVsHuman.js"></script>
-    <script type="text/javascript" src="js/CEndPanelVsCpu.js"></script>
-    <script type="text/javascript" src="js/CCreditsPanel.js"></script>
-    <script type="text/javascript" src="js/CAreYouSurePanel.js"></script>
-    <script type="text/javascript" src="js/CMsgBox.js"></script>
-    <script type="text/javascript" src="js/CDart.js"></script>
-    <script type="text/javascript" src="js/CVector2.js"></script>
-    <script type="text/javascript" src="js/CMath.js"></script>
-    <script type="text/javascript" src="js/CDartBoard.js"></script>
-    <script type="text/javascript" src="js/CRollingScore.js"></script>
-    <script type="text/javascript" src="js/CAlertText.js"></script>
-    <script type="text/javascript" src="js/CScoreText.js"></script>
-    <script type="text/javascript" src="js/CArrowThrow.js"></script>
-    <script type="text/javascript" src="js/CScoreGUI.js"></script>
-    <script type="text/javascript" src="js/CMenuMode.js"></script>
-    <script type="text/javascript" src="js/CLevelBut.js"></script>
-    <script type="text/javascript" src="js/CLevelMenu.js"></script>
-    <script type="text/javascript" src="js/CInfoAI.js"></script>
-    <script type="text/javascript" src="js/CHelpPanel.js"></script>
-    <script type="text/javascript" src="js/CGUIExpandible.js"></script>
-    <script type="text/javascript" src="js/CHelpControls.js"></script>
-    <script type="text/javascript" src="js/CCTLText.js"></script>
-    <script type="text/javascript" src="js/CPromotionGame.js"></script>
-    <script type="text/javascript" src="js/CPromotionWinModal.js"></script>
-    <script type="text/javascript" src="js/CPromotionLoseModal.js"></script>
+        .demo-button {
+            display: inline-block;
+            padding: 15px 30px;
+            margin: 10px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        .demo-button:hover {
+            background-color: #0056b3;
+        }
+
+        .demo-button.win {
+            background-color: #28a745;
+        }
+
+        .demo-button.win:hover {
+            background-color: #1e7e34;
+        }
+
+        .demo-button.lose {
+            background-color: #dc3545;
+        }
+
+        .demo-button.lose:hover {
+            background-color: #c82333;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+
+        .instructions {
+            background-color: #e9ecef;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+    </style>
 </head>
 
-<body ondragstart="return false;" ondrop="return false;">
-    <div style="position: fixed; background-color: transparent; top: 0px; left: 0px; width: 100%; height: 100%"></div>
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            var oMain = new CMain({
-                audio_enable_on_startup: false, //ENABLE/DISABLE AUDIO WHEN GAME STARTS 
-                fullscreen: true     //SET THIS TO FALSE IF YOU DON'T WANT TO SHOW FULLSCREEN BUTTON
-            });
+<body>
+    <div class="demo-container">
+        <h1>Darts Promotion Demo</h1>
 
-            // Check if we're in promotion mode
-            var urlParams = new URLSearchParams(window.location.search);
-            var promotionResult = urlParams.get('promotion_result');
+        <div class="instructions">
+            <h3>How to use:</h3>
+            <ol>
+                <li>Click "Test Win Scenario" to simulate a winning promotion</li>
+                <li>Click "Test Lose Scenario" to simulate a losing promotion</li>
+                <li>In the game, simply click anywhere on the screen to throw the dart</li>
+                <li>For win scenario: Dart will always hit bullseye</li>
+                <li>For lose scenario: Dart will hit random non-bullseye areas</li>
+                <li>After the animation, a modal will appear with the result</li>
+                <li>Click "Continue" to return to this demo</li>
+            </ol>
+        </div>
 
-            if (promotionResult === 'win' || promotionResult === 'lose') {
-                // Set promotion mode
-                PROMOTION_MODE = true;
-                PROMOTION_RESULT = (promotionResult === 'win') ? MODE_PROMOTION_WIN : MODE_PROMOTION_LOSE;
-            }
+        <div style="text-align: center;">
+            <a href="index.html?promotion_result=win" class="demo-button win" target="_blank">
+                🎯 Test Win Scenario
+            </a>
+            <a href="index.html?promotion_result=lose" class="demo-button lose" target="_blank">
+                ❌ Test Lose Scenario
+            </a>
+        </div>
 
-
-            document.addEventListener("start_session", function (evt) {
-                if (getParamValue('ctl-arcade') === "true") {
-                    parent.__ctlArcadeStartSession();
-                }
-                //...ADD YOUR CODE HERE EVENTUALLY
-            });
-
-            document.addEventListener("end_session", function (evt) {
-                if (getParamValue('ctl-arcade') === "true") {
-                    parent.__ctlArcadeEndSession();
-                }
-                //...ADD YOUR CODE HERE EVENTUALLY
-            });
-
-            document.addEventListener("save_score", function (evt) {
-                if (getParamValue('ctl-arcade') === "true") {
-                    parent.__ctlArcadeSaveScore({ score: evt.detail.score });
-                }
-                //...ADD YOUR CODE HERE EVENTUALLY
-            });
-
-            document.addEventListener("show_interlevel_ad", function (evt) {
-                if (getParamValue('ctl-arcade') === "true") {
-                    parent.__ctlArcadeShowInterlevelAD();
-                }
-                //...ADD YOUR CODE HERE EVENTUALLY
-            });
-
-            document.addEventListener("share_event", function (evt) {
-                if (getParamValue('ctl-arcade') === "true") {
-                    parent.__ctlArcadeShareEvent({
-                        img: TEXT_SHARE_IMAGE,
-                        title: TEXT_SHARE_TITLE,
-                        msg: TEXT_SHARE_MSG1 + evt.detail.score + TEXT_SHARE_MSG2,
-                        msg_share: TEXT_SHARE_SHARE1 + evt.detail.score + TEXT_SHARE_SHARE1
-                    });
-
-                }
-                //...ADD YOUR CODE HERE EVENTUALLY
-            });
-
-            if (isIOS()) {
-                setTimeout(function () { sizeHandler(); }, 200);
-            } else {
-                sizeHandler();
-            }
-        });
-
-    </script>
-    <div class="check-fonts">
-        <p class="check-font-1">impact</p>
+        <div style="margin-top: 30px; text-align: center;">
+            <h3>Integration Instructions:</h3>
+            <p>To integrate with your promotion system:</p>
+            <ul style="text-align: left;">
+                <li>Set <code>PROMOTION_MODE = true</code> in settings.js</li>
+                <li>Set <code>PROMOTION_RESULT = MODE_PROMOTION_WIN</code> or <code>MODE_PROMOTION_LOSE</code></li>
+                <li>Or use URL parameters: <code>?promotion_result=win</code> or <code>?promotion_result=lose</code>
+                </li>
+                <li>Listen for events: <code>promotion_win_complete</code> or <code>promotion_lose_complete</code></li>
+            </ul>
+        </div>
     </div>
-
-    <canvas id="canvas" class='ani_hack' width="1920" height="1920"> </canvas>
-    <div id="block_game"
-        style="position: fixed; background-color: transparent; top: 0px; left: 0px; width: 100%; height: 100%; display:none">
-    </div>
-
 </body>
 
 </html>
