@@ -126,22 +126,6 @@ function CPromotionGame(iResult) {
     };
 
     this._throwDart = function () {
-        var iTargetX, iTargetY;
-
-        if (_iResult === MODE_PROMOTION_WIN) {
-            // Always hit bullseye for win - target the center of the dartboard
-            iTargetX = 0; // Center of dartboard (relative to dartboard container)
-            iTargetY = 0; // Center of dartboard (relative to dartboard container)
-        } else {
-            // Random non-bullseye hit for lose
-            var iAngle = Math.random() * 360;
-            var iDistance = PROMOTION_BULLSEYE_RADIUS + Math.random() * (RADIUS_SPHERE_BOARD - PROMOTION_BULLSEYE_RADIUS);
-
-            iTargetX = Math.cos(iAngle * Math.PI / 180) * iDistance;
-            iTargetY = Math.sin(iAngle * Math.PI / 180) * iDistance;
-        }
-
-        // Calculate dart trajectory - Fixed for proper targeting
         var iDartX = _oCurDart.getX();
         var iDartY = _oCurDart.getY();
 
@@ -151,11 +135,28 @@ function CPromotionGame(iResult) {
             var iOffsetX = 960 - iDartX; // Target X coordinate for bullseye
             var fForce = 920; // Exact force for bullseye
 
-
         } else {
-            // For lose scenario, add some randomness
-            var iOffsetX = (Math.random() - 0.5) * 200; // Random horizontal offset
-            var fForce = 100 + Math.random() * 50;
+            // For lose scenario, target the outer/middle rings of the dartboard
+            var iAngle = Math.random() * 360;
+
+            // Target specific ring areas - outer and middle rings
+            // Use a random distance that targets the outer areas of the dartboard
+            var iDistance;
+            if (Math.random() < 0.5) {
+                // Target outer ring (far edge of dartboard)
+                iDistance = 300 + Math.random() * 100; // 300-400 pixels from center
+            } else {
+                // Target middle ring (between outer and inner areas)
+                iDistance = 200 + Math.random() * 80; // 200-280 pixels from center
+            }
+
+            // Calculate target position relative to bullseye center (960, 940)
+            var iTargetX = 960 + Math.cos(iAngle * Math.PI / 180) * iDistance;
+            var iTargetY = 940 + Math.sin(iAngle * Math.PI / 180) * iDistance;
+
+            // Calculate offset to hit this target
+            var iOffsetX = iTargetX - iDartX;
+            var fForce = 920 + (Math.random() - 0.5) * 100; // Vary force around bullseye force
         }
 
         _oCurDart.startAnim(iOffsetX, fForce, iOffsetX / 700);
@@ -201,7 +202,16 @@ function CPromotionGame(iResult) {
         // No continuous updates needed for promotion
     };
 
+    this._endThrow = function () {
+        // This method is called by CDart when the dart animation completes
+        // We don't need to do anything here since we handle the result in _prepareLaunchDart
+    };
+
     s_oPromotionGame = this;
+
+    // Set this promotion game as the global game object so CDart can call _endThrow
+    s_oGame = this;
+
     this._init();
 }
 

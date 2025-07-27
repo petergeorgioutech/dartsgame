@@ -76,13 +76,6 @@
                 // Set promotion mode
                 PROMOTION_MODE = true;
                 PROMOTION_RESULT = (promotionResult === 'win') ? MODE_PROMOTION_WIN : MODE_PROMOTION_LOSE;
-
-                // Listen for preloader completion to start promotion game
-                document.addEventListener("preloader_complete", function () {
-                    setTimeout(function () {
-                        oMain.gotoPromotionGame(PROMOTION_RESULT);
-                    }, 1000);
-                });
             }
 
 

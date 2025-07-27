@@ -188,7 +188,15 @@ function CMain(oData) {
 
         s_oSoundTrack = playSound("soundtrack", 1, true);
 
-        this.gotoMenu();
+        // Check if we're in promotion mode - if so, start promotion game immediately
+        if (PROMOTION_MODE) {
+            // Start promotion game immediately
+            setTimeout(function () {
+                s_oMain.gotoPromotionGame(PROMOTION_RESULT);
+            }, 1000);
+        } else {
+            this.gotoMenu();
+        }
     };
 
     this._onAllImagesLoaded = function () {
@@ -334,4 +342,3 @@ var s_bFirstPlay = true;
 var s_iCurMode = 0;
 var s_iLastLevel = 1;
 var s_iCurLevel = 1;
-var s_bFirstPlay = true;
