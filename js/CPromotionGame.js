@@ -9,9 +9,10 @@ function CPromotionGame(iResult) {
     var _oContainerBg;
     var _oBoardDart;
     var _oCurDart;
-    var _oHitArea;
-    var _oListenerDown;
     var _oResultModal;
+    var _oPlayButton;
+    var _oPlayButtonOverlay;
+    var _oPlayButtonListener;
 
     var _pStartDartPos;
     var _pEndDartPos;
@@ -32,16 +33,17 @@ function CPromotionGame(iResult) {
         this._initDartBoard();
         this._createDart();
 
-        _oHitArea = new createjs.Shape();
-        _oHitArea.graphics.beginFill("rgba(255,0,0,0.01)").drawRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-        _oContainerGame.addChild(_oHitArea);
+        // Create play button overlay instead of hit area
+        this._createPlayButton();
 
-        this._resetHitArea();
         this.refreshButtonPos();
     };
 
     this.unload = function () {
-        _oHitArea.off('mousedown', _oListenerDown);
+        if (_oPlayButtonOverlay) {
+            _oPlayButton.off('mousedown', _oPlayButtonListener);
+            s_oStage.removeChild(_oPlayButtonOverlay);
+        }
 
         if (_oResultModal) {
             _oResultModal.unload();
@@ -105,22 +107,50 @@ function CPromotionGame(iResult) {
     this._createDart = function () {
         var oDart = new CDart(_pStartDartPos.x, _pStartDartPos.y, 0, _pEndDartPos, _oContainerDart);
         _oCurDart = oDart;
+
+        // Stop the dart's back-and-forth animation immediately
+        _oCurDart.stopTween();
     };
 
-    this._resetHitArea = function () {
-        _oListenerDown = _oHitArea.on('mousedown', this.onMouseDown);
+    this._createPlayButton = function () {
+        // Create overlay container
+        _oPlayButtonOverlay = new createjs.Container();
+        _oPlayButtonOverlay.x = 0;
+        _oPlayButtonOverlay.y = 0;
+        s_oStage.addChild(_oPlayButtonOverlay);
+
+        // Create semi-transparent background
+        var oOverlayBg = new createjs.Shape();
+        oOverlayBg.graphics.beginFill("rgba(0,0,0,0.3)").drawRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+        _oPlayButtonOverlay.addChild(oOverlayBg);
+
+        // Create play button using existing button sprite
+        var oPlayButtonSprite = s_oSpriteLibrary.getSprite("but_play");
+        _oPlayButton = createBitmap(oPlayButtonSprite);
+        _oPlayButton.x = CANVAS_WIDTH / 2;
+        _oPlayButton.y = CANVAS_HEIGHT / 2;
+        _oPlayButton.regX = oPlayButtonSprite.width / 2;
+        _oPlayButton.regY = oPlayButtonSprite.height / 2;
+        _oPlayButtonOverlay.addChild(_oPlayButton);
+
+        // Add click listener
+        _oPlayButtonListener = _oPlayButton.on('mousedown', this.onPlayButtonClick);
     };
 
-    this.onMouseDown = function (e) {
+    this.onPlayButtonClick = function (e) {
         if (_bDartThrown) {
             return;
         }
 
         _bDartThrown = true;
-        _oHitArea.off('mousedown', _oListenerDown);
 
-        // Stop the dart's back-and-forth animation
-        _oCurDart.stopTween();
+        // Remove click listener
+        _oPlayButton.off('mousedown', _oPlayButtonListener);
+
+        // Hide the play button overlay with fade out animation
+        createjs.Tween.get(_oPlayButtonOverlay).to({ alpha: 0 }, 300, createjs.Ease.cubicOut).call(function () {
+            s_oStage.removeChild(_oPlayButtonOverlay);
+        });
 
         s_oPromotionGame._throwDart();
     };
