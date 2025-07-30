@@ -325,10 +325,14 @@ function CPromotionGame(iResult) {
         var iDartX = _oCurDart.getX();
         var iDartY = _oCurDart.getY();
 
+        // Get the current dartboard center position (accounting for scaling and positioning)
+        var iDartBoardCenterX = _oContainerDartBoard.x;
+        var iDartBoardCenterY = _oContainerDartBoard.y;
+
         // For win scenario, use exact bullseye coordinates
         if (_iResult === MODE_PROMOTION_WIN) {
-            // Use exact bullseye coordinates from AI_INFO_HIT
-            var iOffsetX = 960 - iDartX; // Target X coordinate for bullseye
+            // Target the center of the dartboard (bullseye)
+            var iOffsetX = iDartBoardCenterX - iDartX;
             var fForce = 920; // Exact force for bullseye
 
         } else {
@@ -340,15 +344,15 @@ function CPromotionGame(iResult) {
             var iDistance;
             if (Math.random() < 0.5) {
                 // Target outer ring (far edge of dartboard)
-                iDistance = 300 + Math.random() * 100; // 300-400 pixels from center
+                iDistance = 150 + Math.random() * 50; // 150-200 pixels from center (scaled)
             } else {
                 // Target middle ring (between outer and inner areas)
-                iDistance = 200 + Math.random() * 80; // 200-280 pixels from center
+                iDistance = 100 + Math.random() * 40; // 100-140 pixels from center (scaled)
             }
 
-            // Calculate target position relative to bullseye center (960, 940)
-            var iTargetX = 960 + Math.cos(iAngle * Math.PI / 180) * iDistance;
-            var iTargetY = 940 + Math.sin(iAngle * Math.PI / 180) * iDistance;
+            // Calculate target position relative to dartboard center
+            var iTargetX = iDartBoardCenterX + Math.cos(iAngle * Math.PI / 180) * iDistance;
+            var iTargetY = iDartBoardCenterY + Math.sin(iAngle * Math.PI / 180) * iDistance;
 
             // Calculate offset to hit this target
             var iOffsetX = iTargetX - iDartX;
@@ -361,18 +365,16 @@ function CPromotionGame(iResult) {
     };
 
     this._prepareLaunchDart = function () {
-        var iNewX = CANVAS_WIDTH / 2 + (CANVAS_WIDTH / 2 - _oCurDart.getNewX());
-        var iNewY = -(_oCurDart.getNewY() - _oContainerDartBoard.y);
+        // Calculate the target position to center the dartboard on screen
+        var iNewX = CANVAS_WIDTH / 2;
+        var iNewY = CANVAS_HEIGHT / 2 - 600; // Move up more to ensure full visibility
 
-        if (!s_bLandscape) {
-            iNewY += CANVAS_HEIGHT / 3;
-        } else {
-            iNewY += CANVAS_HEIGHT / 5;
-        }
+        // Use a more conservative scale to ensure the dartboard fits
+        var iMaxScale = Math.min(CANVAS_WIDTH / _oOriginalBounds.width, CANVAS_HEIGHT / _oOriginalBounds.height) * 0.6;
 
-        createjs.Tween.get(_oContainerDartBoard).to({ y: iNewY + 200 }, 500, createjs.Ease.cubicOut).to({ y: iNewY }, 500, createjs.Ease.sineIn);
+        createjs.Tween.get(_oContainerDartBoard).to({ y: iNewY + 100 }, 500, createjs.Ease.cubicOut).to({ y: iNewY }, 500, createjs.Ease.sineIn);
         createjs.Tween.get(_oContainerDartBoard).to({ x: iNewX }, PROMOTION_ANIMATION_DURATION, createjs.Ease.cubicOut);
-        createjs.Tween.get(_oContainerDartBoard).to({ scaleX: 1.5, scaleY: 1.5 }, PROMOTION_ANIMATION_DURATION, createjs.Ease.cubicOut);
+        createjs.Tween.get(_oContainerDartBoard).to({ scaleX: iMaxScale, scaleY: iMaxScale }, PROMOTION_ANIMATION_DURATION, createjs.Ease.cubicOut);
 
         playSound("launch", 1, false);
 
