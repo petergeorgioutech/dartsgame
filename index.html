@@ -125,10 +125,10 @@
         </div>
 
         <div style="text-align: center;">
-            <a href="demo.html?promotion_result=win" class="demo-button win" target="_blank">
+            <a href="demo.html" class="demo-button win" target="_blank" onclick="setDemoPromotionMode('win')">
                 🎯 Test Win Scenario
             </a>
-            <a href="demo.html?promotion_result=lose" class="demo-button lose" target="_blank">
+            <a href="demo.html" class="demo-button lose" target="_blank" onclick="setDemoPromotionMode('lose')">
                 ❌ Test Lose Scenario
             </a>
         </div>
@@ -154,6 +154,24 @@
             </button>
             <button class="btn btn-danger" onclick="showLoseModal()">
                 ❌ Show Lose Modal
+            </button>
+        </div>
+
+        <div style="margin-top: 30px; text-align: center;">
+            <h3>JavaScript Control Examples:</h3>
+            <p>You can also control promotion settings programmatically:</p>
+            <button class="btn btn-outline-primary me-2"
+                onclick="console.log('Current settings:', {mode: PROMOTION_MODE, result: PROMOTION_RESULT})">
+                Log Current Settings
+            </button>
+            <button class="btn btn-outline-success me-2" onclick="enablePromotionWin()">
+                Enable Win Mode
+            </button>
+            <button class="btn btn-outline-danger me-2" onclick="enablePromotionLose()">
+                Enable Lose Mode
+            </button>
+            <button class="btn btn-outline-secondary" onclick="disablePromotion()">
+                Disable Promotion
             </button>
         </div>
     </div>
@@ -211,6 +229,13 @@
         document.addEventListener('promotion_lose_result', function () {
             showLoseModal();
         });
+
+        // Function to set promotion mode when opening demo
+        function setDemoPromotionMode(result) {
+            // Store the promotion mode in sessionStorage so demo.html can read it
+            sessionStorage.setItem('promotion_mode', 'true');
+            sessionStorage.setItem('promotion_result', result);
+        }
     </script>
 </body>
 
