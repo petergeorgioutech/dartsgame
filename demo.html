@@ -13,6 +13,49 @@
         content="width=device-width, user-scalable=no, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, minimal-ui" />
     <meta name="msapplication-tap-highlight" content="no" />
 
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .promotion-modal .modal-content {
+            border-radius: 15px;
+            border: none;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .promotion-modal .modal-header {
+            border-bottom: none;
+            padding: 30px 30px 20px;
+        }
+
+        .promotion-modal .modal-body {
+            padding: 20px 30px 30px;
+            text-align: center;
+        }
+
+        .promotion-modal .btn {
+            border-radius: 25px;
+            padding: 12px 30px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .win-modal .modal-header {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+        }
+
+        .lose-modal .modal-header {
+            background: linear-gradient(135deg, #dc3545, #fd7e14);
+            color: white;
+        }
+
+        .result-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+    </style>
+
     <script type="text/javascript" src="js/createjs.min.js"></script>
     <script type="text/javascript" src="js/howler.min.js"></script>
     <script type="text/javascript" src="js/screenfull.js"></script>
@@ -137,6 +180,61 @@
     <div id="block_game"
         style="position: fixed; background-color: transparent; top: 0px; left: 0px; width: 100%; height: 100%; display:none">
     </div>
+
+    <!-- Bootstrap Modal for Promotion Results -->
+    <div class="modal fade promotion-modal" id="promotionResultModal" tabindex="-1"
+        aria-labelledby="promotionResultModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="promotionResultModalLabel">Result</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="result-icon" id="resultIcon"></div>
+                    <h4 id="resultTitle">Result</h4>
+                    <p id="resultMessage">Result message will appear here.</p>
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Continue</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Initialize Bootstrap modal
+        const promotionModal = new bootstrap.Modal(document.getElementById('promotionResultModal'));
+
+        // Function to show win modal
+        function showWinModal() {
+            document.getElementById('resultIcon').innerHTML = '🎯';
+            document.getElementById('resultTitle').textContent = 'BULLSEYE! YOU WIN!';
+            document.getElementById('resultMessage').textContent = 'Congratulations! You hit the bullseye and won the prize!';
+            document.querySelector('.modal-header').className = 'modal-header win-modal';
+            promotionModal.show();
+        }
+
+        // Function to show lose modal
+        function showLoseModal() {
+            document.getElementById('resultIcon').innerHTML = '❌';
+            document.getElementById('resultTitle').textContent = 'NICE TRY! BETTER LUCK NEXT TIME!';
+            document.getElementById('resultMessage').textContent = 'You missed the bullseye this time. Try again for another chance to win!';
+            document.querySelector('.modal-header').className = 'modal-header lose-modal';
+            promotionModal.show();
+        }
+
+        // Listen for promotion result events from the game
+        document.addEventListener('promotion_win_result', function () {
+            showWinModal();
+        });
+
+        document.addEventListener('promotion_lose_result', function () {
+            showLoseModal();
+        });
+    </script>
 
 </body>
 

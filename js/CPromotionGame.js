@@ -398,10 +398,12 @@ function CPromotionGame(iResult) {
 
         if (_iResult === MODE_PROMOTION_WIN) {
             playSound("win", 1, false);
-            _oResultModal = new CPromotionWinModal();
+            // Dispatch event instead of showing modal
+            document.dispatchEvent(new CustomEvent("promotion_win_result"));
         } else {
             playSound("miss", 1, false);
-            _oResultModal = new CPromotionLoseModal();
+            // Dispatch event instead of showing modal
+            document.dispatchEvent(new CustomEvent("promotion_lose_result"));
         }
     };
 
