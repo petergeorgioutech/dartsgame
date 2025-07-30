@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Darts Game - Bundled Template</title>
+
+    <!-- Include the bundled CSS -->
+    <link rel="stylesheet" href="bundle.css" type="text/css">
+
+    <!-- Bootstrap CSS (optional, for modals) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .promotion-modal .modal-content {
+            border-radius: 15px;
+            border: none;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .promotion-modal .modal-header {
+            border-bottom: none;
+            padding: 30px 30px 20px;
+        }
+
+        .promotion-modal .modal-body {
+            padding: 20px 30px 30px;
+            text-align: center;
+        }
+
+        .promotion-modal .btn {
+            border-radius: 25px;
+            padding: 12px 30px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .win-modal .modal-header {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+        }
+
+        .lose-modal .modal-header {
+            background: linear-gradient(135deg, #dc3545, #fd7e14);
+            color: white;
+        }
+
+        .result-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+    </style>
+
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, minimal-ui" />
+    <meta name="msapplication-tap-highlight" content="no" />
+</head>
+
+<body ondragstart="return false;" ondrop="return false;">
+    <!-- Game container -->
+    <div style="position: fixed; background-color: transparent; top: 0px; left: 0px; width: 100%; height: 100%"></div>
+
+    <!-- Canvas for the game -->
+    <canvas id="canvas" class='ani_hack' width="1920" height="1920" data-promotion-mode="true"
+        data-promotion-result="win"></canvas>
+
+    <!-- Block overlay for pause functionality -->
+    <div id="block_game"
+        style="position: fixed; background-color: transparent; top: 0px; left: 0px; width: 100%; height: 100%; display:none">
+    </div>
+
+    <!-- Optional: Bootstrap Modal for Promotion Results -->
+    <div class="modal fade promotion-modal" id="promotionResultModal" tabindex="-1"
+        aria-labelledby="promotionResultModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="promotionResultModalLabel">Result</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="result-icon" id="resultIcon"></div>
+                    <h4 id="resultTitle">Result</h4>
+                    <p id="resultMessage">Result message will appear here.</p>
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Continue</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Include the bundled JavaScript -->
+    <script type="text/javascript" src="bundle.js"></script>
+
+    <!-- Bootstrap JS (optional, for modals) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Initialize Bootstrap modal
+        const promotionModal = new bootstrap.Modal(document.getElementById('promotionResultModal'));
+
+        // Function to show win modal
+        function showWinModal() {
+            document.getElementById('resultIcon').innerHTML = '🎯';
+            document.getElementById('resultTitle').textContent = 'BULLSEYE! YOU WIN!';
+            document.getElementById('resultMessage').textContent = 'Congratulations! You hit the bullseye and won the prize!';
+            document.querySelector('.modal-header').className = 'modal-header win-modal';
+            promotionModal.show();
+        }
+
+        // Function to show lose modal
+        function showLoseModal() {
+            document.getElementById('resultIcon').innerHTML = '❌';
+            document.getElementById('resultTitle').textContent = 'NICE TRY! BETTER LUCK NEXT TIME!';
+            document.getElementById('resultMessage').textContent = 'You missed the bullseye this time. Try again for another chance to win!';
+            document.querySelector('.modal-header').className = 'modal-header lose-modal';
+            promotionModal.show();
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            // Initialize the game
+            var oMain = new CMain({
+                audio_enable_on_startup: false, // ENABLE/DISABLE AUDIO WHEN GAME STARTS 
+                fullscreen: true     // SET THIS TO FALSE IF YOU DON'T WANT TO SHOW FULLSCREEN BUTTON
+            });
+
+            // Optional: Check for promotion mode settings
+            var canvas = document.getElementById('canvas');
+            var promotionMode = canvas.getAttribute('data-promotion-mode');
+            var promotionResult = canvas.getAttribute('data-promotion-result');
+
+            if (promotionMode === 'true') {
+                PROMOTION_MODE = true;
+                PROMOTION_RESULT = (promotionResult === 'win') ? MODE_PROMOTION_WIN : MODE_PROMOTION_LOSE;
+                console.log('Promotion mode enabled:', promotionResult);
+            }
+
+            // Optional: Event listeners for game events
+            document.addEventListener("start_session", function (evt) {
+                console.log("Game session started");
+                // Add your custom code here
+            });
+
+            document.addEventListener("end_session", function (evt) {
+                console.log("Game session ended");
+                // Add your custom code here
+            });
+
+            document.addEventListener("save_score", function (evt) {
+                console.log("Score saved:", evt.detail.score);
+                // Add your custom code here
+            });
+
+            // Promotion result event listeners - these will show the modals
+            document.addEventListener('promotion_win_result', function () {
+                console.log("Promotion win result");
+                showWinModal();
+            });
+
+            document.addEventListener('promotion_lose_result', function () {
+                console.log("Promotion lose result");
+                showLoseModal();
+            });
+
+            // Handle responsive sizing
+            if (isIOS()) {
+                setTimeout(function () { sizeHandler(); }, 200);
+            } else {
+                sizeHandler();
+            }
+        });
+    </script>
+
+    <!-- Font check div -->
+    <div class="check-fonts">
+        <p class="check-font-1">impact</p>
+    </div>
+</body>
+
+</html>
