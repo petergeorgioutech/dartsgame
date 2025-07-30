@@ -191,14 +191,13 @@ function CMain(oData) {
         // Check if we're in promotion mode - if so, start promotion game immediately
         console.log("Checking promotion mode:", PROMOTION_MODE, "Result:", PROMOTION_RESULT);
         if (PROMOTION_MODE) {
-            // Start promotion game immediately
-            console.log("Starting promotion game...");
-            setTimeout(function () {
-                s_oMain.gotoPromotionGame(PROMOTION_RESULT);
-            }, 1000);
+            // Start promotion game immediately without delay
+            console.log("Starting promotion game immediately...");
+            s_oMain.gotoPromotionGame(PROMOTION_RESULT);
         } else {
-            console.log("Starting normal menu...");
-            this.gotoMenu();
+            console.log("Starting game directly...");
+            s_iCurMode = MODE_SINGLE; // Set default mode to single player
+            this.gotoGame();
         }
     };
 
