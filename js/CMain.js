@@ -189,12 +189,15 @@ function CMain(oData) {
         s_oSoundTrack = playSound("soundtrack", 1, true);
 
         // Check if we're in promotion mode - if so, start promotion game immediately
+        console.log("Checking promotion mode:", PROMOTION_MODE, "Result:", PROMOTION_RESULT);
         if (PROMOTION_MODE) {
             // Start promotion game immediately
+            console.log("Starting promotion game...");
             setTimeout(function () {
                 s_oMain.gotoPromotionGame(PROMOTION_RESULT);
             }, 1000);
         } else {
+            console.log("Starting normal menu...");
             this.gotoMenu();
         }
     };
@@ -243,8 +246,10 @@ function CMain(oData) {
     };
 
     this.gotoPromotionGame = function (iResult) {
+        console.log("Creating promotion game with result:", iResult);
         _oPromotionGame = new CPromotionGame(iResult);
         _iState = STATE_PROMOTION;
+        console.log("Promotion game created, state set to:", _iState);
     };
 
     this.stopUpdateNoBlock = function () {

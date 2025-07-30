@@ -10,6 +10,8 @@ function CPromotionGame(iResult) {
     var _oContainerBg;
     var _oBoardDart;
     var _oCurDart;
+    var _oDartContainer; // New container for the visible dart
+    var _oVisibleDart; // Reference to the visible dart sprite
     var _oResultModal;
     var _oInstructionsModal;
     var _oPlayButton;
@@ -23,6 +25,8 @@ function CPromotionGame(iResult) {
     var _oOriginalBounds;
 
     this._init = function () {
+        console.log("Initializing promotion game...");
+
         // Disable soundtrack for promotion
         if (s_oSoundTrack) {
             s_oSoundTrack.stop();
@@ -41,6 +45,8 @@ function CPromotionGame(iResult) {
 
         // Show instructions modal first
         this._showInstructions();
+
+        console.log("Promotion game initialization complete");
     };
 
     this.unload = function () {
@@ -123,10 +129,69 @@ function CPromotionGame(iResult) {
 
         // Stop the dart's back-and-forth animation immediately
         _oCurDart.stopTween();
+
+        // Hide the actual throwing dart initially
+        _oCurDart.alpha = 0;
+
+        // Create a separate container for the visible dart (positioned relative to game container)
+        _oDartContainer = new createjs.Container();
+        _oContainerGame.addChild(_oDartContainer);
+
+        // Create a copy of the dart sprite for the visible dart
+        var oDartSprite = s_oSpriteLibrary.getSprite("dart_0_0"); // Use first dart sprite
+        var oVisibleDart = createBitmap(oDartSprite);
+        oVisibleDart.x = 0;
+        oVisibleDart.y = 0;
+        oVisibleDart.regX = oDartSprite.width / 2;
+        oVisibleDart.regY = oDartSprite.height / 2;
+        oVisibleDart.scaleX = 0.2; // Make it smaller
+        oVisibleDart.scaleY = 0.2; // Make it smaller
+        _oDartContainer.addChild(oVisibleDart);
+
+        // Store reference to visible dart
+        _oVisibleDart = oVisibleDart;
+
+        // Make dart fully opaque
+        _oVisibleDart.alpha = 1;
+    };
+
+    this._showDartAndThrow = function () {
+        // Fade out the visible dart
+        createjs.Tween.get(_oVisibleDart).to({ alpha: 0 }, 200, createjs.Ease.cubicOut);
+
+        // Start the throwing motion immediately
+        s_oPromotionGame._startThrowingMotion();
+    };
+
+    this._startThrowingMotion = function () {
+        // Hide the visible dart
+        _oVisibleDart.alpha = 0;
+
+        // Position the actual throwing dart at the same location as the visible dart
+        _oCurDart.x = _oDartContainer.x;
+        _oCurDart.y = _oDartContainer.y;
+
+        // Make the throwing dart visible
+        _oCurDart.alpha = 1;
+
+        // Store original position
+        var originalX = _oCurDart.x;
+        var originalY = _oCurDart.y;
+
+        // Move dart back (wind-up motion)
+        createjs.Tween.get(_oCurDart).to({
+            x: originalX - 200,
+            y: originalY - 50
+        }, 400, createjs.Ease.cubicOut).call(function () {
+            // After wind-up, throw the dart forward
+            s_oPromotionGame._throwDart();
+        });
     };
 
     this._showInstructions = function () {
+        console.log("Showing instructions modal...");
         _oInstructionsModal = new CPromotionInstructionsModal();
+        console.log("Instructions modal created:", _oInstructionsModal ? "yes" : "no");
     };
 
     this._startGame = function () {
@@ -140,6 +205,9 @@ function CPromotionGame(iResult) {
 
         // Create play button overlay
         this._createPlayButton();
+
+        // Position dart next to the play button
+        this._positionDartNextToButton();
     };
 
     this._positionDartBoardNormal = function () {
@@ -215,6 +283,15 @@ function CPromotionGame(iResult) {
         }
     };
 
+    this._positionDartNextToButton = function () {
+        // Position dart container to the left of the play button
+        _oDartContainer.x = _oPlayButtonContainer.x - 150; // 150px to the left of play button
+        _oDartContainer.y = _oPlayButtonContainer.y; // Same Y position as play button
+
+        console.log("Dart container positioned at:", _oDartContainer.x, _oDartContainer.y);
+        console.log("Play button at:", _oPlayButtonContainer.x, _oPlayButtonContainer.y);
+    };
+
     this.onPlayButtonHover = function (e) {
         createjs.Tween.get(_oPlayButton).to({ scaleX: 1.2, scaleY: 1.2 }, 200, createjs.Ease.cubicOut);
     };
@@ -238,9 +315,10 @@ function CPromotionGame(iResult) {
         // Hide the play button with fade out animation
         createjs.Tween.get(_oPlayButtonContainer).to({ alpha: 0 }, 300, createjs.Ease.cubicOut).call(function () {
             s_oStage.removeChild(_oPlayButtonContainer);
-        });
 
-        s_oPromotionGame._throwDart();
+            // After play button is hidden, fade in the dart and then throw it
+            s_oPromotionGame._showDartAndThrow();
+        });
     };
 
     this._throwDart = function () {
