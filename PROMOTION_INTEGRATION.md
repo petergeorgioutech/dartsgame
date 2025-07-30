@@ -38,6 +38,16 @@ PROMOTION_RESULT = MODE_PROMOTION_WIN;  // or MODE_PROMOTION_LOSE
 s_oMain.gotoPromotionGame(MODE_PROMOTION_WIN);  // or MODE_PROMOTION_LOSE
 ```
 
+### Method 4: Data Attributes (Recommended for Custom Text)
+```html
+<canvas id="canvas" 
+    data-promotion-mode="true"
+    data-promotion-result="win"
+    data-promotion-instructions-title="Welcome to our promotion!&#10;&#10;Aim for the bullseye to win!&#10;&#10;Click anywhere to throw!"
+    data-promotion-instructions-button-text="Let's Play!">
+</canvas>
+```
+
 ## Event Handling
 
 Listen for completion events to integrate with your promotion flow:
@@ -57,6 +67,38 @@ document.addEventListener("promotion_lose_complete", function() {
     // Your code here...
 });
 ```
+
+## Customizing Instruction Text
+
+You can customize the instruction text that appears in the introduction modal:
+
+### Method 1: Data Attributes (Recommended)
+```html
+<canvas id="canvas" 
+    data-promotion-mode="true"
+    data-promotion-result="win"
+    data-promotion-instructions-title="Welcome to our promotion!&#10;&#10;Aim for the bullseye to win!&#10;&#10;Click anywhere to throw!"
+    data-promotion-instructions-button-text="Let's Play!">
+</canvas>
+```
+
+### Method 2: JavaScript Variables
+```javascript
+// Set before game initialization
+PROMOTION_INSTRUCTIONS_TITLE = "Welcome to our promotion!\n\nAim for the bullseye to win!\n\nClick anywhere to throw!";
+PROMOTION_INSTRUCTIONS_BUTTON_TEXT = "Let's Play!";
+```
+
+### Method 3: Programmatic Control
+```javascript
+// After game is loaded
+setPromotionMode(true, 'win', 
+    "Welcome to our promotion!\n\nAim for the bullseye to win!\n\nClick anywhere to throw!", 
+    "Let's Play!"
+);
+```
+
+**Note:** Use `&#10;` for line breaks in HTML data attributes, or `\n` in JavaScript strings.
 
 ## Complete Integration Example
 

@@ -71,3 +71,7 @@ var PROMOTION_RESULT = MODE_PROMOTION_WIN; // MODE_PROMOTION_WIN or MODE_PROMOTI
 var PROMOTION_BULLSEYE_RADIUS = 17; // Radius for bullseye hit detection
 var PROMOTION_ANIMATION_DURATION = 2000; // Duration of dart animation in ms
 var PROMOTION_MODAL_DELAY = 1000; // Delay before showing result modal
+
+// Promotion instruction text variables
+var PROMOTION_INSTRUCTIONS_TITLE = "To be in with a chance of winning,\nfollow the instructions to fire the dart.\n\nIf you hit the bullseye, you win a prize.\n\nGood luck";
+var PROMOTION_INSTRUCTIONS_BUTTON_TEXT = "Continue →";

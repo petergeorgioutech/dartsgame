@@ -142,6 +142,23 @@
                 console.log('Promotion mode enabled from data attributes:', promotionResult);
             }
 
+            // Read instruction text from data attributes if promotion mode is enabled
+            if (PROMOTION_MODE) {
+                var instructionsTitle = canvas.getAttribute('data-promotion-instructions-title');
+                var instructionsButtonText = canvas.getAttribute('data-promotion-instructions-button-text');
+
+                if (instructionsTitle) {
+                    // Convert HTML entities back to newlines
+                    PROMOTION_INSTRUCTIONS_TITLE = instructionsTitle.replace(/&#10;/g, '\n');
+                    console.log('Instructions title set from data attribute');
+                }
+
+                if (instructionsButtonText) {
+                    PROMOTION_INSTRUCTIONS_BUTTON_TEXT = instructionsButtonText;
+                    console.log('Instructions button text set from data attribute');
+                }
+            }
+
 
             document.addEventListener("start_session", function (evt) {
                 if (getParamValue('ctl-arcade') === "true") {
@@ -197,7 +214,9 @@
     </div>
 
     <canvas id="canvas" class='ani_hack' width="1920" height="1920" data-promotion-mode="true"
-        data-promotion-result="lose"> </canvas>
+        data-promotion-result="lose"
+        data-promotion-instructions-title="To be in with a chance of winning,&#10;follow the instructions to fire the dart.&#10;&#10;If you hit the bullseye, you win a prize.&#10;&#10;Good luck"
+        data-promotion-instructions-button-text="Continue →"> </canvas>
     <div id="block_game"
         style="position: fixed; background-color: transparent; top: 0px; left: 0px; width: 100%; height: 100%; display:none">
     </div>
@@ -257,14 +276,32 @@
         });
 
         // Helper functions to control promotion settings
-        function setPromotionMode(enabled, result) {
+        function setPromotionMode(enabled, result, instructionsTitle, instructionsButtonText) {
             var canvas = document.getElementById('canvas');
             canvas.setAttribute('data-promotion-mode', enabled.toString());
             canvas.setAttribute('data-promotion-result', result);
 
+            if (instructionsTitle) {
+                // Convert newlines to HTML entities for data attribute
+                var encodedTitle = instructionsTitle.replace(/\n/g, '&#10;');
+                canvas.setAttribute('data-promotion-instructions-title', encodedTitle);
+            }
+
+            if (instructionsButtonText) {
+                canvas.setAttribute('data-promotion-instructions-button-text', instructionsButtonText);
+            }
+
             // Update global settings
             PROMOTION_MODE = enabled;
             PROMOTION_RESULT = (result === 'win') ? MODE_PROMOTION_WIN : MODE_PROMOTION_LOSE;
+
+            if (instructionsTitle) {
+                PROMOTION_INSTRUCTIONS_TITLE = instructionsTitle;
+            }
+
+            if (instructionsButtonText) {
+                PROMOTION_INSTRUCTIONS_BUTTON_TEXT = instructionsButtonText;
+            }
 
             console.log('Promotion mode set to:', enabled, 'with result:', result);
         }
@@ -281,11 +318,26 @@
             setPromotionMode(false, 'win');
         }
 
+        // Example functions for custom instruction text
+        function setCustomInstructions() {
+            var customTitle = "Welcome to our special promotion!\n\nAim for the bullseye to win amazing prizes.\n\nClick anywhere to throw your dart!";
+            var customButtonText = "Let's Play!";
+            setPromotionMode(true, 'win', customTitle, customButtonText);
+        }
+
+        function setSpanishInstructions() {
+            var spanishTitle = "¡Bienvenido a nuestra promoción especial!\n\nApunta al centro para ganar premios increíbles.\n\n¡Haz clic en cualquier lugar para lanzar tu dardo!";
+            var spanishButtonText = "¡Juguemos!";
+            setPromotionMode(true, 'win', spanishTitle, spanishButtonText);
+        }
+
         // Make functions globally available
         window.setPromotionMode = setPromotionMode;
         window.enablePromotionWin = enablePromotionWin;
         window.enablePromotionLose = enablePromotionLose;
         window.disablePromotion = disablePromotion;
+        window.setCustomInstructions = setCustomInstructions;
+        window.setSpanishInstructions = setSpanishInstructions;
     </script>
 
 </body>

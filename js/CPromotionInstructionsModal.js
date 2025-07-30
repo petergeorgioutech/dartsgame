@@ -20,7 +20,7 @@ function CPromotionInstructionsModal() {
         _oContainer.addChild(_oModalBg);
 
         // Instructions text
-        _oText = new createjs.Text("To be in with a chance of winning,\nfollow the instructions to fire the dart.\n\nIf you hit the bullseye, you win a prize.\n\nGood luck", "bold 40px " + FONT, "#333333");
+        _oText = new createjs.Text(PROMOTION_INSTRUCTIONS_TITLE, "bold 40px " + FONT, "#333333");
         _oText.textAlign = "center";
         _oText.textBaseline = "middle";
         _oText.x = CANVAS_WIDTH / 2;
@@ -40,7 +40,7 @@ function CPromotionInstructionsModal() {
         _oButContinue.addChild(_oButtonBg);
 
         // Button text
-        var _oButtonText = new createjs.Text("Continue →", "bold 24px " + FONT, "#f1eee8");
+        var _oButtonText = new createjs.Text(PROMOTION_INSTRUCTIONS_BUTTON_TEXT, "bold 24px " + FONT, "#f1eee8");
         _oButtonText.textAlign = "center";
         _oButtonText.textBaseline = "middle";
         _oButtonText.x = 0;

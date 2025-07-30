@@ -62,7 +62,9 @@
 
     <!-- Canvas for the game -->
     <canvas id="canvas" class='ani_hack' width="1920" height="1920" data-promotion-mode="true"
-        data-promotion-result="win"></canvas>
+        data-promotion-result="win"
+        data-promotion-instructions-title="To be in with a chance of winning,&#10;follow the instructions to fire the dart.&#10;&#10;If you hit the bullseye, you win a prize.&#10;&#10;Good luck"
+        data-promotion-instructions-button-text="Continue →"></canvas>
 
     <!-- Block overlay for pause functionality -->
     <div id="block_game"
@@ -133,6 +135,21 @@
                 PROMOTION_MODE = true;
                 PROMOTION_RESULT = (promotionResult === 'win') ? MODE_PROMOTION_WIN : MODE_PROMOTION_LOSE;
                 console.log('Promotion mode enabled:', promotionResult);
+
+                // Read instruction text from data attributes
+                var instructionsTitle = canvas.getAttribute('data-promotion-instructions-title');
+                var instructionsButtonText = canvas.getAttribute('data-promotion-instructions-button-text');
+
+                if (instructionsTitle) {
+                    // Convert HTML entities back to newlines
+                    PROMOTION_INSTRUCTIONS_TITLE = instructionsTitle.replace(/&#10;/g, '\n');
+                    console.log('Instructions title set from data attribute');
+                }
+
+                if (instructionsButtonText) {
+                    PROMOTION_INSTRUCTIONS_BUTTON_TEXT = instructionsButtonText;
+                    console.log('Instructions button text set from data attribute');
+                }
             }
 
             // Optional: Event listeners for game events

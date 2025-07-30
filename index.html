@@ -174,6 +174,20 @@
                 Disable Promotion
             </button>
         </div>
+
+        <div style="margin-top: 30px; text-align: center;">
+            <h3>Custom Instruction Text Examples:</h3>
+            <p>Test different instruction text configurations:</p>
+            <button class="btn btn-outline-info me-2" onclick="setCustomInstructions()">
+                Set Custom Instructions
+            </button>
+            <button class="btn btn-outline-warning me-2" onclick="setSpanishInstructions()">
+                Set Spanish Instructions
+            </button>
+            <button class="btn btn-outline-dark me-2" onclick="setSimpleInstructions()">
+                Set Simple Instructions
+            </button>
+        </div>
     </div>
 
     <!-- Bootstrap Modal for Promotion Results -->
@@ -236,6 +250,77 @@
             sessionStorage.setItem('promotion_mode', 'true');
             sessionStorage.setItem('promotion_result', result);
         }
+
+        // Helper functions to control promotion settings
+        function setPromotionMode(enabled, result, instructionsTitle, instructionsButtonText) {
+            var canvas = document.getElementById('canvas');
+            canvas.setAttribute('data-promotion-mode', enabled.toString());
+            canvas.setAttribute('data-promotion-result', result);
+
+            if (instructionsTitle) {
+                // Convert newlines to HTML entities for data attribute
+                var encodedTitle = instructionsTitle.replace(/\n/g, '&#10;');
+                canvas.setAttribute('data-promotion-instructions-title', encodedTitle);
+            }
+
+            if (instructionsButtonText) {
+                canvas.setAttribute('data-promotion-instructions-button-text', instructionsButtonText);
+            }
+
+            // Update global settings
+            PROMOTION_MODE = enabled;
+            PROMOTION_RESULT = (result === 'win') ? MODE_PROMOTION_WIN : MODE_PROMOTION_LOSE;
+
+            if (instructionsTitle) {
+                PROMOTION_INSTRUCTIONS_TITLE = instructionsTitle;
+            }
+
+            if (instructionsButtonText) {
+                PROMOTION_INSTRUCTIONS_BUTTON_TEXT = instructionsButtonText;
+            }
+
+            console.log('Promotion mode set to:', enabled, 'with result:', result);
+        }
+
+        function enablePromotionWin() {
+            setPromotionMode(true, 'win');
+        }
+
+        function enablePromotionLose() {
+            setPromotionMode(true, 'lose');
+        }
+
+        function disablePromotion() {
+            setPromotionMode(false, 'win');
+        }
+
+        // Example functions for custom instruction text
+        function setCustomInstructions() {
+            var customTitle = "Welcome to our special promotion!\n\nAim for the bullseye to win amazing prizes.\n\nClick anywhere to throw your dart!";
+            var customButtonText = "Let's Play!";
+            setPromotionMode(true, 'win', customTitle, customButtonText);
+        }
+
+        function setSpanishInstructions() {
+            var spanishTitle = "¡Bienvenido a nuestra promoción especial!\n\nApunta al centro para ganar premios increíbles.\n\n¡Haz clic en cualquier lugar para lanzar tu dardo!";
+            var spanishButtonText = "¡Juguemos!";
+            setPromotionMode(true, 'win', spanishTitle, spanishButtonText);
+        }
+
+        function setSimpleInstructions() {
+            var simpleTitle = "Simple instructions\n\nJust click to play!";
+            var simpleButtonText = "Start";
+            setPromotionMode(true, 'win', simpleTitle, simpleButtonText);
+        }
+
+        // Make functions globally available
+        window.setPromotionMode = setPromotionMode;
+        window.enablePromotionWin = enablePromotionWin;
+        window.enablePromotionLose = enablePromotionLose;
+        window.disablePromotion = disablePromotion;
+        window.setCustomInstructions = setCustomInstructions;
+        window.setSpanishInstructions = setSpanishInstructions;
+        window.setSimpleInstructions = setSimpleInstructions;
     </script>
 </body>
 
