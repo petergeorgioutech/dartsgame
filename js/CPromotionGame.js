@@ -2,6 +2,7 @@ function CPromotionGame(iResult) {
     var _iResult = iResult; // MODE_PROMOTION_WIN or MODE_PROMOTION_LOSE
     var _bDartThrown = false;
     var _bAnimationComplete = false;
+    var _bGameStarted = false;
 
     var _oContainerGame;
     var _oContainerDartBoard;
@@ -10,14 +11,16 @@ function CPromotionGame(iResult) {
     var _oBoardDart;
     var _oCurDart;
     var _oResultModal;
+    var _oInstructionsModal;
     var _oPlayButton;
-    var _oPlayButtonOverlay;
+    var _oPlayButtonContainer;
     var _oPlayButtonListener;
 
     var _pStartDartPos;
     var _pEndDartPos;
     var _iHeightDartBoard;
     var _iStartXDartBoard;
+    var _oOriginalBounds;
 
     this._init = function () {
         // Disable soundtrack for promotion
@@ -33,20 +36,25 @@ function CPromotionGame(iResult) {
         this._initDartBoard();
         this._createDart();
 
-        // Create play button overlay instead of hit area
-        this._createPlayButton();
+        // Position dartboard at normal scale for instructions modal
+        this._positionDartBoardNormal();
 
-        this.refreshButtonPos();
+        // Show instructions modal first
+        this._showInstructions();
     };
 
     this.unload = function () {
-        if (_oPlayButtonOverlay) {
+        if (_oPlayButtonContainer) {
             _oPlayButton.off('mousedown', _oPlayButtonListener);
-            s_oStage.removeChild(_oPlayButtonOverlay);
+            s_oStage.removeChild(_oPlayButtonContainer);
         }
 
         if (_oResultModal) {
             _oResultModal.unload();
+        }
+
+        if (_oInstructionsModal) {
+            _oInstructionsModal.unload();
         }
 
         s_oPromotionGame = null;
@@ -55,8 +63,10 @@ function CPromotionGame(iResult) {
     };
 
     this.refreshButtonPos = function () {
-        _oContainerDartBoard.y = s_iOffsetY + 20;
-        this.refreshGridScale();
+        if (_bGameStarted) {
+            // Only apply scaling when game has started
+            this.refreshGridScale();
+        }
     };
 
     this.refreshGridScale = function () {
@@ -94,6 +104,9 @@ function CPromotionGame(iResult) {
         _iHeightDartBoard = _pStartDartPos.y;
         _oContainerDartBoard.regX = _oContainerDartBoard.getBounds().width / 2;
         _oContainerDartBoard.x = _iStartXDartBoard = CANVAS_WIDTH / 2;
+
+        // Store original bounds for later scaling
+        _oOriginalBounds = _oContainerDartBoard.getBounds();
     };
 
     this._initBg = function () {
@@ -112,29 +125,102 @@ function CPromotionGame(iResult) {
         _oCurDart.stopTween();
     };
 
-    this._createPlayButton = function () {
-        // Create overlay container
-        _oPlayButtonOverlay = new createjs.Container();
-        _oPlayButtonOverlay.x = 0;
-        _oPlayButtonOverlay.y = 0;
-        s_oStage.addChild(_oPlayButtonOverlay);
+    this._showInstructions = function () {
+        _oInstructionsModal = new CPromotionInstructionsModal();
+    };
 
-        // Create semi-transparent background
-        var oOverlayBg = new createjs.Shape();
-        oOverlayBg.graphics.beginFill("rgba(0,0,0,0.3)").drawRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-        _oPlayButtonOverlay.addChild(oOverlayBg);
+    this._startGame = function () {
+        _bGameStarted = true;
+
+        // Position dartboard for gameplay
+        _oContainerDartBoard.y = s_iOffsetY + 20;
+
+        // Apply proper scaling for the game
+        this.refreshButtonPos();
+
+        // Create play button overlay
+        this._createPlayButton();
+    };
+
+    this._positionDartBoardNormal = function () {
+        // Position dartboard at normal scale without applying game scaling
+        _oContainerDartBoard.y = s_iOffsetY + 20;
+
+        // Set normal scale (no zoom)
+        _oContainerDartBoard.scaleX = _oContainerDartBoard.scaleY = 1;
+
+        // Position background normally
+        _oContainerBg.regX = (CANVAS_WIDTH / 2);
+        _oContainerBg.x = (CANVAS_WIDTH / 2);
+        _oContainerBg.regY = CANVAS_HEIGHT / 2;
+        _oContainerBg.y = CANVAS_HEIGHT / 2;
+
+        // Set background to normal scale
+        _oContainerBg.scaleX = _oContainerBg.scaleY = 1;
+    };
+
+    this._createPlayButton = function () {
+        // Create play button container
+        _oPlayButtonContainer = new createjs.Container();
+        _oContainerGame.addChild(_oPlayButtonContainer);
 
         // Create play button using existing button sprite
         var oPlayButtonSprite = s_oSpriteLibrary.getSprite("but_play");
         _oPlayButton = createBitmap(oPlayButtonSprite);
-        _oPlayButton.x = CANVAS_WIDTH / 2;
-        _oPlayButton.y = CANVAS_HEIGHT / 2;
+        _oPlayButton.x = 0;
+        _oPlayButton.y = 0;
         _oPlayButton.regX = oPlayButtonSprite.width / 2;
         _oPlayButton.regY = oPlayButtonSprite.height / 2;
-        _oPlayButtonOverlay.addChild(_oPlayButton);
+        _oPlayButtonContainer.addChild(_oPlayButton);
+
+        // Make button more visible for debugging
+        _oPlayButton.alpha = 1;
+        console.log("Button sprite loaded:", oPlayButtonSprite ? "yes" : "no");
+        console.log("Button dimensions:", oPlayButtonSprite ? oPlayButtonSprite.width + "x" + oPlayButtonSprite.height : "unknown");
+
+        // Position the button container below the dartboard
+        this._positionPlayButton();
 
         // Add click listener
         _oPlayButtonListener = _oPlayButton.on('mousedown', this.onPlayButtonClick);
+
+        // Add hover effects
+        _oPlayButton.on('mouseover', this.onPlayButtonHover);
+        _oPlayButton.on('mouseout', this.onPlayButtonOut);
+
+        // Set cursor to pointer
+        _oPlayButton.cursor = "pointer";
+
+        // Debug: Make button more visible for testing
+        console.log("Play button created and positioned");
+    };
+
+    this._positionPlayButton = function () {
+        // Position the play button below the dartboard using a simpler approach
+        var iDartBoardCenterY = _oContainerDartBoard.y;
+        var iDartBoardHeight = 800; // Approximate dartboard height in pixels
+
+        _oPlayButtonContainer.x = CANVAS_WIDTH / 2;
+        _oPlayButtonContainer.y = iDartBoardCenterY + (iDartBoardHeight * _oContainerDartBoard.scaleY) + 500; // 450px below dartboard bottom
+
+        // Debug: Log the positioning
+        console.log("Dartboard Y:", _oContainerDartBoard.y);
+        console.log("Dartboard scale:", _oContainerDartBoard.scaleY);
+        console.log("Button Y:", _oPlayButtonContainer.y);
+
+        // Fallback: If button is off-screen, position it in a visible area
+        if (_oPlayButtonContainer.y > CANVAS_HEIGHT - 100) {
+            _oPlayButtonContainer.y = CANVAS_HEIGHT - 150;
+            console.log("Button repositioned to fallback position:", _oPlayButtonContainer.y);
+        }
+    };
+
+    this.onPlayButtonHover = function (e) {
+        createjs.Tween.get(_oPlayButton).to({ scaleX: 1.2, scaleY: 1.2 }, 200, createjs.Ease.cubicOut);
+    };
+
+    this.onPlayButtonOut = function (e) {
+        createjs.Tween.get(_oPlayButton).to({ scaleX: 1, scaleY: 1 }, 200, createjs.Ease.cubicOut);
     };
 
     this.onPlayButtonClick = function (e) {
@@ -146,10 +232,12 @@ function CPromotionGame(iResult) {
 
         // Remove click listener
         _oPlayButton.off('mousedown', _oPlayButtonListener);
+        _oPlayButton.off('mouseover', s_oPromotionGame.onPlayButtonHover);
+        _oPlayButton.off('mouseout', s_oPromotionGame.onPlayButtonOut);
 
-        // Hide the play button overlay with fade out animation
-        createjs.Tween.get(_oPlayButtonOverlay).to({ alpha: 0 }, 300, createjs.Ease.cubicOut).call(function () {
-            s_oStage.removeChild(_oPlayButtonOverlay);
+        // Hide the play button with fade out animation
+        createjs.Tween.get(_oPlayButtonContainer).to({ alpha: 0 }, 300, createjs.Ease.cubicOut).call(function () {
+            s_oStage.removeChild(_oPlayButtonContainer);
         });
 
         s_oPromotionGame._throwDart();
