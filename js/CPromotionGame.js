@@ -211,20 +211,25 @@ function CPromotionGame(iResult) {
     };
 
     this._positionDartBoardNormal = function () {
-        // Position dartboard at normal scale without applying game scaling
-        _oContainerDartBoard.y = s_iOffsetY + 20;
+        // Position dartboard with the same scaling as the game for consistency
+        _oContainerDartBoard.y = s_iOffsetY + 0;
 
-        // Set normal scale (no zoom)
-        _oContainerDartBoard.scaleX = _oContainerDartBoard.scaleY = 1;
+        // Apply the same scaling logic as refreshGridScale() but without setting CUR_GRID_SCALE
+        var iGUIHeight = 100;
+        var iMaxGridSizeHeight = (CANVAS_HEIGHT - (s_iOffsetY * 2)) - iGUIHeight;
 
-        // Position background normally
+        var fGridScale = iMaxGridSizeHeight / _iHeightDartBoard;
+        fGridScale = parseFloat(fGridScale.toFixed(2));
+        _oContainerDartBoard.scaleX = _oContainerDartBoard.scaleY = fGridScale;
+
+        // Position background with the same scaling as the game
         _oContainerBg.regX = (CANVAS_WIDTH / 2);
         _oContainerBg.x = (CANVAS_WIDTH / 2);
         _oContainerBg.regY = CANVAS_HEIGHT / 2;
         _oContainerBg.y = CANVAS_HEIGHT / 2;
 
-        // Set background to normal scale
-        _oContainerBg.scaleX = _oContainerBg.scaleY = 1;
+        _oContainerBg.scaleX = _oContainerBg.scaleY = 1 / fGridScale;
+        _oContainerBg.scaleX = _oContainerBg.scaleY *= 1.5;
     };
 
     this._createPlayButton = function () {
