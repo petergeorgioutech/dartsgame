@@ -198,7 +198,7 @@ function CPromotionGame(iResult) {
         _bGameStarted = true;
 
         // Position dartboard for gameplay
-        _oContainerDartBoard.y = s_iOffsetY + 20;
+        _oContainerDartBoard.y = s_iOffsetY + 0;
 
         // Apply proper scaling for the game
         this.refreshButtonPos();
@@ -371,10 +371,14 @@ function CPromotionGame(iResult) {
 
         // Use a more conservative scale to ensure the dartboard fits
         var iMaxScale = Math.min(CANVAS_WIDTH / _oOriginalBounds.width, CANVAS_HEIGHT / _oOriginalBounds.height) * 0.6;
+        var iZoomedScale = iMaxScale * 1.2; // Zoom in by 20%
 
         createjs.Tween.get(_oContainerDartBoard).to({ y: iNewY + 100 }, 500, createjs.Ease.cubicOut).to({ y: iNewY }, 500, createjs.Ease.sineIn);
         createjs.Tween.get(_oContainerDartBoard).to({ x: iNewX }, PROMOTION_ANIMATION_DURATION, createjs.Ease.cubicOut);
-        createjs.Tween.get(_oContainerDartBoard).to({ scaleX: iMaxScale, scaleY: iMaxScale }, PROMOTION_ANIMATION_DURATION, createjs.Ease.cubicOut);
+        createjs.Tween.get(_oContainerDartBoard).to({ scaleX: iMaxScale, scaleY: iMaxScale }, PROMOTION_ANIMATION_DURATION * 0.7, createjs.Ease.cubicOut).call(function () {
+            // Zoom in slightly after the initial positioning
+            createjs.Tween.get(_oContainerDartBoard).to({ scaleX: iZoomedScale, scaleY: iZoomedScale }, PROMOTION_ANIMATION_DURATION * 0.3, createjs.Ease.cubicOut);
+        });
 
         playSound("launch", 1, false);
 
