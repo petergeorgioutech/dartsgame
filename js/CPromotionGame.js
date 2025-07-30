@@ -201,7 +201,7 @@ function CPromotionGame(iResult) {
         var iDartBoardHeight = 800; // Approximate dartboard height in pixels
 
         _oPlayButtonContainer.x = CANVAS_WIDTH / 2;
-        _oPlayButtonContainer.y = iDartBoardCenterY + (iDartBoardHeight * _oContainerDartBoard.scaleY) + 500; // 450px below dartboard bottom
+        _oPlayButtonContainer.y = iDartBoardCenterY + (iDartBoardHeight * _oContainerDartBoard.scaleY) + 500; // 700px below dartboard bottom
 
         // Debug: Log the positioning
         console.log("Dartboard Y:", _oContainerDartBoard.y);
